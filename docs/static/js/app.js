@@ -47,8 +47,8 @@ function generateTable(table, data) {
               }
             }
           }
-        // //clear input field
-        //   document.getElementById("datetime").value = ""
+        //clear input field - *will not be present in Level 2 as we need to stack multiple value as criteria*
+          document.getElementById("datetime").value = ""
     }
 
 
