@@ -1,58 +1,62 @@
 // from data.js
 var tableData = data;
-
+var tbody = d3.select("tbody");
 
 // YOUR CODE HERE!
 
 //////////LEVEL 1////////////////
+  function generateTable(data) {
+    // First, clear out any existing data
+    tbody.html("");
+    // Next, loop through each object in the data
+    data.forEach((dataRow)=>{
+      var row = tbody.append("tr");
+      // Loop through each field in the dataRow and add
+      // each value as a table cell (td)
+      Object.values(dataRow).forEach((val)=>{
+        var cell = row.append("td");
+        cell.text(val)
+      });
+    });
+  };
+    // and append a row and cells for each value in the row
+      // Append a row to the table body
 
-// function to populate the table with the data provided
-function generateTable(table, data) {
-    for (var i of data) {
-      var row = table.insertRow();
-      for (key in i) {
-        var cell = row.insertCell();
-        var text = document.createTextNode(i[key]);
-        cell.appendChild(text);
-      }
-    }
+///////////////////////////////////
+
+// Keep Track of all filters
+var filters = {};
+function updateFilters() {
+  // Save the element, value, and id of the filter that was changed
+  var changed_element = d3.select(this).select("input")
+  var element_value = changed_element.property("value")
+  var filter_id = changed_element.attr("id")
+  // If a filter value was entered then add that filterId and value
+  // to the filters list. Otherwise, clear that filter from the filters object
+  if(element_value) {
+    filters[filter_id] = element_value
+  } 
+  else {
+    delete filters[filter_id]
   }
-  
-  var table = document.querySelector("table");
-  var data = Object.keys(tableData[0]);
+  // Call function to apply all filters and rebuild the table
+  filterTable();
+}
+function filterTable() {
+  // Set the filteredData to the tableData
+  let filteredData = tableData;
+  // Loop through all of the filters and keep any data that
+  // matches the filter values
+  Object.entries(filters).forEach(([key, value]) => {
+    filteredData = filteredData.filter(row => row[key] === value);
+  });
+  // Finally, rebuild the table using the filtered Data
+  generateTable(filteredData);
+};
 
-  // call the function
-  generateTable(table, tableData);
+// Attach an event to listen for changes to each filter
+d3.selectAll(".filter").on("change", updateFilters);
+// Build the table when the page loads
+generateTable(tableData);
 
-  //bind target for on function targeting
-  var button = d3.select("#filter-btn");
-
-//   create handler function
-  function datehandle(){
-    //prevent page refresh
-    d3.event.preventDefault();
-    // variable creation for handler
-    var table = document.getElementById("ufo-table");
-    var tr = table.getElementsByTagName("tr");
-    var input = document.getElementById("datetime");
-    var filter = input.value.toUpperCase()
-    for (i=0; i<tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[0];
-        if (td) {
-            txtValue = td.textContent || td.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-              } else {
-                tr[i].style.display = "none";
-              }
-            }
-          }
-        //clear input field - *will not be present in Level 2 as we need to stack multiple value as criteria*
-          document.getElementById("datetime").value = ""
-    }
-
-
-  // On function for target button
-  button.on("click", datehandle)
-
-//////////LEVEL 2////////////////
+console.log(filters)
